@@ -7,6 +7,7 @@ from visualizing_raw_data import visual
 from tokenize_tweets import tokenize
 from stop_words_remove import stopclean
 from stem_tweet import stems
+from frequency import frequencies
 
 try:
     twitter_samples.fileids()
@@ -41,4 +42,13 @@ negative_clean_tokens=[stopclean(t) for t in clean_negative]
 clean_tweet_positive=[stems(t) for t in positive_clean_tokens]
 clean_tweet_negative=[stems(t) for t in negative_clean_tokens]
 
-print(len(clean_tweet_positive),len(clean_tweet_negative))
+ypos=np.ones(len(clean_tweet_positive))
+yneg=np.zeros(len(clean_tweet_negative))
+
+y=np.concatenate((ypos,yneg))
+
+total_clean_tweets=clean_tweet_negative+clean_tweet_positive
+
+freq=frequencies(total_clean_tweets,y)
+
+print(freq)
