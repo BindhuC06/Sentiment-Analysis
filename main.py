@@ -8,6 +8,7 @@ from stop_words_remove import stopclean
 from stem_tweet import stems
 from frequency import frequencies
 from naive_bayes import train_naive_bayes, predict_tweet
+from evaluate import test_naive_bayes
 
 try:
     twitter_samples.fileids()
@@ -44,16 +45,38 @@ negative_clean_tokens=[stopclean(t) for t in clean_negative]
 clean_tweet_positive=[stems(t) for t in positive_clean_tokens]
 clean_tweet_negative=[stems(t) for t in negative_clean_tokens]
 
-ypos=np.ones(len(clean_tweet_positive))
-yneg=np.zeros(len(clean_tweet_negative))
+# ypos=np.ones(len(clean_tweet_positive))
+# yneg=np.zeros(len(clean_tweet_negative))
 
-y=np.concatenate((ypos,yneg))
+# y=np.concatenate((ypos,yneg))
 
-total_clean_tweets=clean_tweet_negative+clean_tweet_positive
+# total_clean_tweets=clean_tweet_negative+clean_tweet_positive
 
-freq=frequencies(total_clean_tweets,y)
+# splitting the data into training  and testing datasets.
 
-logprior,loglikelihood=train_naive_bayes(freq,total_clean_tweets,y)
+all_positive = clean_tweet_positive
+all_negative = clean_tweet_negative
+#80:20
+split_pos = int(0.8 * len(all_positive))
+split_neg = int(0.8 * len(all_negative))
+
+train_pos = all_positive[:split_pos]
+test_pos  = all_positive[split_pos:]
+
+train_neg = all_negative[:split_neg]
+test_neg  = all_negative[split_neg:]
+
+train_x=train_pos + train_neg
+train_y=np.concatenate((np.ones(len(train_pos)),np.zeros(len(train_neg))))
+
+x_test=test_pos + test_neg
+y_test=np.concatenate((np.ones(len(test_pos)),np.zeros(len(test_neg)))) 
+
+freq=frequencies(train_x,train_y)
+logprior,loglikelihood=train_naive_bayes(freq,train_x,train_y)
+
+accuracy=test_naive_bayes(x_test,y_test,logprior,loglikelihood)
+print(f"Accuracy of the model is {accuracy*100:.2f} %")
 
 while(True):
     tweet=input("Enter a tweet to predict its sentiment:")
