@@ -168,6 +168,9 @@ The tweet is negative
 ## Author
 
 Bindhu
+
 B.Tech Computer Science Student
+
 Gitam University Hyderabad
+
 GitHub: https://github.com/BindhuC06
