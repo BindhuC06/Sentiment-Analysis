@@ -3,11 +3,11 @@ import numpy as np
 import nltk
 from nltk.corpus import twitter_samples 
 from clean_re import clean
-from visualizing_raw_data import visual
 from tokenize_tweets import tokenize
 from stop_words_remove import stopclean
 from stem_tweet import stems
 from frequency import frequencies
+from naive_bayes import train_naive_bayes, predict_tweet
 
 try:
     twitter_samples.fileids()
@@ -19,7 +19,9 @@ negative_data=twitter_samples.strings('negative_tweets.json')
 
 # visualizing 
 
-visual(positive_data,negative_data)
+from visualizing_raw_data import visual
+
+# visual(positive_data,negative_data)
 
 # cleaning the tweets using re library and 
 # tokentizing the tweets -- splitting the tweets into individual words wint no tabs.
@@ -51,4 +53,13 @@ total_clean_tweets=clean_tweet_negative+clean_tweet_positive
 
 freq=frequencies(total_clean_tweets,y)
 
-print(freq)
+logprior,loglikelihood=train_naive_bayes(freq,total_clean_tweets,y)
+
+while(True):
+    tweet=input("Enter a tweet to predict its sentiment:")
+    clean_tweet=stems(stopclean(tokenize(clean(tweet))))
+    score=predict_tweet(clean_tweet,logprior,loglikelihood)
+    if score>0:
+        print("The tweet is positive")
+    else:
+        print("The tweet is negative")
